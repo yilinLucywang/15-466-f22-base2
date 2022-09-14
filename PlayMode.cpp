@@ -121,7 +121,6 @@ PlayMode::~PlayMode() {
 }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
-
 	if (evt.type == SDL_KEYDOWN) {
 		if (evt.key.keysym.sym == SDLK_ESCAPE) {
 			SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -167,7 +166,6 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		//pours the water to the groud
 		else if(evt.key.keysym.sym == SDLK_SPACE) {
 			pour_water = true; 
-			should_spawn = true; 
 			return true;
 		}
 		//TODO: change end
@@ -205,6 +203,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		}
 		else if(evt.key.keysym.sym == SDLK_SPACE) {
 			pour_water = false;
+			should_spawn = true; 
 			return true; 
 		}
 		//TODO: change end
@@ -229,14 +228,13 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			return true;
 		}
 	}
-
 	return false;
 }
 
 void PlayMode::update(float elapsed) {
 
 	//slowly rotates through [0,1):
-	wobble += elapsed / 4.0f;
+	wobble += elapsed / 10.0f;
 	wobble -= std::floor(wobble);
 
 	if(pour_water){
@@ -320,12 +318,17 @@ void PlayMode::update(float elapsed) {
 //TODO: change the transform of the tree
 void PlayMode::spawn_tree(){
 	should_spawn = false;
-
+	std::cout << treeCnt << std::endl;
 	leaves_vector[treeCnt]->position = water_bucket->position + leaves->position - trunk->position;
 	leaves_vector[treeCnt]->position.z = leaves->position.z;
 	trunk_vector[treeCnt]->position = water_bucket->position;
 	trunk_vector[treeCnt]->position.z = trunk->position.z;
-	treeCnt = treeCnt + 1;
+	if(treeCnt < 4){
+		treeCnt = treeCnt + 1;
+	}
+	else{
+		treeCnt = 4;
+	}
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
@@ -365,12 +368,12 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		));
 
 		constexpr float H = 0.09f;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; arrow keys moves the water bucket; escape ungrabs mouse",
+		lines.draw_text("WASD moves camera; arrows moves bucket; space play pour water animation and plant tree",
 			glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 		float ofs = 2.0f / drawable_size.y;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; arrow keys moves the water bucket; escape ungrabs mouse",
+		lines.draw_text("WASD moves camera; arrow moves bucket; space play pour water animation and plant tree",
 			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
