@@ -12,23 +12,52 @@
 
 #include <random>
 
-GLuint hexapod_meshes_for_lit_color_texture_program = 0;
-Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
+//TODO: the game goal is to decorate the empty lawn
+//TODO: 1. move the water vessel along with wsad
+//TODO: 2. spawn a new tree after the left mouse is clicked 
+//TODO: 3. move the camera after the new tree is spawned
+// GLuint hexapod_meshes_for_lit_color_texture_program = 0;
+// Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
+// 	MeshBuffer const *ret = new MeshBuffer(data_path("hexapod.pnct"));
+// 	hexapod_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
+// 	return ret;
+// });
+
+// Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
+// 	return new Scene(data_path("hexapod.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
+// 		Mesh const &mesh = hexapod_meshes->lookup(mesh_name);
+
+// 		scene.drawables.emplace_back(transform);
+// 		Scene::Drawable &drawable = scene.drawables.back();
+
+// 		drawable.pipeline = lit_color_texture_program_pipeline;
+
+// 		drawable.pipeline.vao = hexapod_meshes_for_lit_color_texture_program;
+// 		drawable.pipeline.type = mesh.type;
+// 		drawable.pipeline.start = mesh.start;
+// 		drawable.pipeline.count = mesh.count;
+
+// 	});
+// });
+
+//TODO: working on this now
+GLuint entire_scene_meshes_for_lit_color_texture_program = 0;
+Load< MeshBuffer > entire_scene_meshes(LoadTagDefault, []() -> MeshBuffer const * {
 	MeshBuffer const *ret = new MeshBuffer(data_path("entireScene.pnct"));
-	hexapod_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
+	entire_scene_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
 	return ret;
 });
 
-Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
+Load< Scene > entire_scene_scene(LoadTagDefault, []() -> Scene const * {
 	return new Scene(data_path("entireScene.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
-		Mesh const &mesh = hexapod_meshes->lookup(mesh_name);
+		Mesh const &mesh = entire_scene_meshes->lookup(mesh_name);
 
 		scene.drawables.emplace_back(transform);
 		Scene::Drawable &drawable = scene.drawables.back();
 
 		drawable.pipeline = lit_color_texture_program_pipeline;
 
-		drawable.pipeline.vao = hexapod_meshes_for_lit_color_texture_program;
+		drawable.pipeline.vao = entire_scene_meshes_for_lit_color_texture_program;
 		drawable.pipeline.type = mesh.type;
 		drawable.pipeline.start = mesh.start;
 		drawable.pipeline.count = mesh.count;
@@ -36,8 +65,12 @@ Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
 	});
 });
 
-PlayMode::PlayMode() : scene(*hexapod_scene) {
+PlayMode::PlayMode() : scene(*entire_scene_scene) {
 	//get pointers to leg for convenience:
+	
+	//TODO: the printing is functional again!!!! things got printed here!!!!
+	std::string filename = "printing!!!!";
+	std::cout << filename << "'." << std::endl;
 	// for (auto &transform : scene.transforms) {
 	// 	if (transform.name == "Hip.FL") hip = &transform;
 	// 	else if (transform.name == "UpperLeg.FL") upper_leg = &transform;
@@ -51,12 +84,6 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 	// upper_leg_base_rotation = upper_leg->rotation;
 	// lower_leg_base_rotation = lower_leg->rotation;
 
-	for(auto &transform : scene.transforms) {
-		if(transform.name == "waterVessel"){
-			water_bucket = &transform;
-		}
-	}
-	if(water_bucket == nullptr) throw std::runtime_error("water bucket not found.");
 	//get pointer to camera for convenience:
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
@@ -64,6 +91,35 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 
 PlayMode::~PlayMode() {
 }
+//change end
+
+
+// PlayMode::PlayMode() : scene(*hexapod_scene) {
+// 	//get pointers to leg for convenience:
+	
+// 	//TODO: the printing is functional again!!!! things got printed here!!!!
+// 	std::string filename = "printing!!!!";
+// 	std::cout << filename << "'." << std::endl;
+// 	for (auto &transform : scene.transforms) {
+// 		if (transform.name == "Hip.FL") hip = &transform;
+// 		else if (transform.name == "UpperLeg.FL") upper_leg = &transform;
+// 		else if (transform.name == "LowerLeg.FL") lower_leg = &transform;
+// 	}
+// 	if (hip == nullptr) throw std::runtime_error("Hip not found.");
+// 	if (upper_leg == nullptr) throw std::runtime_error("Upper leg not found.");
+// 	if (lower_leg == nullptr) throw std::runtime_error("Lower leg not found.");
+
+// 	hip_base_rotation = hip->rotation;
+// 	upper_leg_base_rotation = upper_leg->rotation;
+// 	lower_leg_base_rotation = lower_leg->rotation;
+
+// 	//get pointer to camera for convenience:
+// 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
+// 	camera = &scene.cameras.front();
+// }
+
+// PlayMode::~PlayMode() {
+// }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
 
@@ -87,30 +143,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			down.downs += 1;
 			down.pressed = true;
 			return true;
-		} 
-
-
-		//TODO: change start
-		else if (evt.key.keysym.sym == SDLK_LEFT) {
-			w_left.downs += 1;
-			w_left.pressed = true;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_RIGHT) {
-			w_right.downs += 1;
-			w_right.pressed = true;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_UP) {
-			w_up.downs += 1;
-			w_up.pressed = true;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_DOWN) {
-			w_down.downs += 1;
-			w_down.pressed = true;
-			return true;
 		}
-		//TODO: change end
-
-
 	} else if (evt.type == SDL_KEYUP) {
 		if (evt.key.keysym.sym == SDLK_a) {
 			left.pressed = false;
@@ -125,31 +158,15 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			down.pressed = false;
 			return true;
 		}
-
-
-		//TODO: change start
-		else if (evt.key.keysym.sym == SDLK_LEFT) {
-			w_left.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_RIGHT) {
-			w_right.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_UP) {
-			w_up.pressed = false;
-			return true;
-		} else if (evt.key.keysym.sym == SDLK_DOWN) {
-			w_down.pressed = false;
-			return true;
-		}
-		//TODO: change end
-
-	//TODO: change here
 	} else if (evt.type == SDL_MOUSEBUTTONDOWN) {
 		if (SDL_GetRelativeMouseMode() == SDL_FALSE) {
 			SDL_SetRelativeMouseMode(SDL_TRUE);
 			return true;
 		}
 	} else if (evt.type == SDL_MOUSEMOTION) {
+
+		//mouse down; then follow the mouse motion
+		//This is for camera only
 		if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
 			glm::vec2 motion = glm::vec2(
 				evt.motion.xrel / float(window_size.y),
@@ -163,9 +180,9 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			return true;
 		}
 	}
-
 	return false;
 }
+
 
 void PlayMode::update(float elapsed) {
 
@@ -185,6 +202,9 @@ void PlayMode::update(float elapsed) {
 	// 	glm::radians(10.0f * std::sin(wobble * 3.0f * 2.0f * float(M_PI))),
 	// 	glm::vec3(0.0f, 0.0f, 1.0f)
 	// );
+
+	//TODO: get the current water bucket location
+
 
 	//move camera:
 	{
@@ -208,42 +228,11 @@ void PlayMode::update(float elapsed) {
 		camera->transform->position += move.x * frame_right + move.y * frame_forward;
 	}
 
-	//move the water bucket
-	{
-		constexpr float PlayerSpeed = 30.0f;
-		glm::vec2 w_move = glm::vec2(0.0f);
-		if (w_left.pressed && !w_right.pressed) w_move.x =-1.0f;
-		if (!w_left.pressed && w_right.pressed) w_move.x = 1.0f;
-		if (w_down.pressed && !w_up.pressed) w_move.y =-1.0f;
-		if (!w_down.pressed && w_up.pressed) w_move.y = 1.0f;
-
-		//make it so that moving diagonally doesn't go faster:
-		if (w_move != glm::vec2(0.0f)) w_move = glm::normalize(w_move) * PlayerSpeed * elapsed;
-
-		// glm::mat4x3 frame = camera->transform->make_local_to_parent();
-		// glm::vec3 frame_right = frame[0];
-		// //glm::vec3 up = frame[1];
-		// glm::vec3 frame_forward = -frame[2];
-
-		// camera->transform->position += move.x * frame_right + move.y * frame_forward;
-
-		glm::mat4x3 w_frame = water_bucket->make_local_to_parent();
-		glm::vec3 w_frame_right = w_frame[0];
-		//glm::vec3 up = frame[1];
-		glm::vec3 w_frame_forward = -w_frame[2];
-		//TODO: water bucket move
-		water_bucket->position += w_move.x * w_frame_right + w_move.y * w_frame_forward; 
-	}
-
 	//reset button press counters:
 	left.downs = 0;
 	right.downs = 0;
 	up.downs = 0;
 	down.downs = 0;
-	w_left.downs = 0;
-	w_right.downs = 0;
-	w_up.downs = 0;
-	w_down.downs = 0;
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
@@ -269,9 +258,6 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 
 	scene.draw(*camera);
 
-
-	//TODO: modifies the water bucket
-
 	{ //use DrawLines to overlay some text:
 		glDisable(GL_DEPTH_TEST);
 		float aspect = float(drawable_size.x) / float(drawable_size.y);
@@ -283,12 +269,12 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		));
 
 		constexpr float H = 0.09f;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; arrow keys moves the water bucket; escape ungrabs mouse",
+		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
 			glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 		float ofs = 2.0f / drawable_size.y;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; arrow keys moves the water bucket; escape ungrabs mouse",
+		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
 			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));

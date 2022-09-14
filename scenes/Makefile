@@ -16,12 +16,20 @@ EXPORT_SCENE=export-scene.py
 DIST=../dist
 
 all : \
-	$(DIST)/hexapod.pnct \
-	$(DIST)/hexapod.scene \
+	$(DIST)/entireScene.pnct \
+	$(DIST)/entireScene.scene \
+# 	$(DIST)/hexapod.pnct \
+# 	$(DIST)/hexapod.scene \
 
 
-$(DIST)/hexapod.scene : hexapod.blend $(EXPORT_SCENE)
+# $(DIST)/hexapod.scene : hexapod.blend $(EXPORT_SCENE)
+# 	$(BLENDER) --background --python $(EXPORT_SCENE) -- '$<':Main '$@'
+
+# $(DIST)/hexapod.pnct : hexapod.blend $(EXPORT_MESHES)
+# 	$(BLENDER) --background --python $(EXPORT_MESHES) -- '$<':Main '$@'
+
+$(DIST)/entireScene.scene : entireSceneNoGrass.blend $(EXPORT_SCENE)
 	$(BLENDER) --background --python $(EXPORT_SCENE) -- '$<':Main '$@'
 
-$(DIST)/hexapod.pnct : hexapod.blend $(EXPORT_MESHES)
+$(DIST)/entireScene.pnct : entireSceneNoGrass.blend $(EXPORT_MESHES)
 	$(BLENDER) --background --python $(EXPORT_MESHES) -- '$<':Main '$@'
