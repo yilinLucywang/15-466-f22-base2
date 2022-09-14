@@ -46,8 +46,6 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 	// if (hip == nullptr) throw std::runtime_error("Hip not found.");
 	// if (upper_leg == nullptr) throw std::runtime_error("Upper leg not found.");
 	// if (lower_leg == nullptr) throw std::runtime_error("Lower leg not found.");
-
-	//water_bucket_rotation = water_bucket->rotation;
 	// upper_leg_base_rotation = upper_leg->rotation;
 	// lower_leg_base_rotation = lower_leg->rotation;
 
@@ -57,6 +55,8 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 		}
 	}
 	if(water_bucket == nullptr) throw std::runtime_error("water bucket not found.");
+	//TODO: issues here
+	water_bucket_rotation = water_bucket->rotation;
 	//get pointer to camera for convenience:
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
@@ -110,11 +110,10 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		}
 
 		//pours the water to the groud
-		// else if(evt.key.keysym.sym == SDLK_p) {
-		// 	pour_water.downs += 1; 
-		// 	pour_water.pressed = true; 
-		// 	return true;
-		// }
+		else if(evt.key.keysym.sym == SDLK_SPACE) {
+			pour_water = true; 
+			return true;
+		}
 		//TODO: change end
 
 
@@ -148,10 +147,10 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			w_down.pressed = false;
 			return true;
 		}
-		// else if(evt.key.keysym.sym == SDLK_p) {
-		// 	pour_water.pressed = false;
-		// 	return true; 
-		// }
+		else if(evt.key.keysym.sym == SDLK_SPACE) {
+			pour_water = false;
+			return true; 
+		}
 		//TODO: change end
 
 	//TODO: change here
@@ -180,9 +179,9 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 
 void PlayMode::update(float elapsed) {
 
-	// //slowly rotates through [0,1):
-	// wobble += elapsed / 10.0f;
-	// wobble -= std::floor(wobble);
+	//slowly rotates through [0,1):
+	wobble += elapsed / 10.0f;
+	wobble -= std::floor(wobble);
 
 	// hip->rotation = hip_base_rotation * glm::angleAxis(
 	// 	glm::radians(5.0f * std::sin(wobble * 2.0f * float(M_PI))),
@@ -197,10 +196,10 @@ void PlayMode::update(float elapsed) {
 	// 	glm::vec3(0.0f, 0.0f, 1.0f)
 	// );
 
-	// water_bucket->rotation = water_bucket_rotation * glm::angleAxis(
-	// glm::radians(5.0f * std::sin(wobble * 2.0f * float(M_PI))),
-	// glm::vec3(0.0f, 1.0f, 0.0f)
-	// );
+	water_bucket->rotation = water_bucket_rotation * glm::angleAxis(
+	glm::radians(90.0f * std::sin(wobble * 2.0f * float(M_PI))),
+	glm::vec3(1.0f, 0.0f, 0.0f)
+	);
 
 	//move camera:
 	{
@@ -261,7 +260,6 @@ void PlayMode::update(float elapsed) {
 	w_right.downs = 0;
 	w_up.downs = 0;
 	w_down.downs = 0;
-	// pour_water.downs = 0;
 }
 
 // void PlayMode::spawn_tree(){
