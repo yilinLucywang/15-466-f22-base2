@@ -43,5 +43,6 @@ struct PlayMode : Mode {
 	//water bucket: 
 	Scene::Transform *water_bucket = nullptr;
 	glm::quat water_bucket_rotation;
+	glm::quat water_bucket_rotation_original;
 
 };
