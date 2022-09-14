@@ -29,7 +29,7 @@ struct PlayMode : Mode {
 
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
-	// void spawn_tree();
+	void spawn_tree();
 	// hexapod leg to wobble:
 	// Scene::Transform *hip = nullptr;
 	// Scene::Transform *upper_leg = nullptr;
