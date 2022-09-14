@@ -53,11 +53,65 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 		if(transform.name == "waterVessel"){
 			water_bucket = &transform;
 		}
+		if(transform.name == "leaves"){
+			leaves = &transform;
+		}
+		if(transform.name == "trunk"){
+			trunk = &transform;
+		}
+
+		if(transform.name == "leaves0"){
+			leaves0 = &transform;
+		}
+		if(transform.name == "trunk0"){
+			trunk0 = &transform;
+		}
+
+		if(transform.name == "leaves1"){
+			leaves1 = &transform;
+		}
+		if(transform.name == "trunk1"){
+			trunk1 = &transform;
+		}
+
+		if(transform.name == "leaves2"){
+			leaves2 = &transform;
+		}
+		if(transform.name == "trunk2"){
+			trunk2 = &transform;
+		}
+
+		if(transform.name == "leaves3"){
+			leaves3 = &transform;
+		}
+		if(transform.name == "trunk3"){
+			trunk3 = &transform;
+		}
+
+		if(transform.name == "leaves4"){
+			leaves4 = &transform;
+		}
+		if(transform.name == "trunk4"){
+			trunk4 = &transform;
+		}
 	}
 	if(water_bucket == nullptr) throw std::runtime_error("water bucket not found.");
+	if(trunk4 == nullptr) throw std::runtime_error("trunk4 not found.");
 	//TODO: issues here
 	water_bucket_rotation = water_bucket->rotation;
 	water_bucket_rotation_original = water_bucket->rotation;
+	
+	leaves_vector.push_back(leaves0); 
+	leaves_vector.push_back(leaves1); 
+	leaves_vector.push_back(leaves2); 
+	leaves_vector.push_back(leaves3); 
+	leaves_vector.push_back(leaves4); 
+
+	trunk_vector.push_back(trunk0);
+	trunk_vector.push_back(trunk1);
+	trunk_vector.push_back(trunk2);
+	trunk_vector.push_back(trunk3);
+	trunk_vector.push_back(trunk4);
 	//get pointer to camera for convenience:
 	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
@@ -113,6 +167,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		//pours the water to the groud
 		else if(evt.key.keysym.sym == SDLK_SPACE) {
 			pour_water = true; 
+			should_spawn = true; 
 			return true;
 		}
 		//TODO: change end
@@ -189,10 +244,17 @@ void PlayMode::update(float elapsed) {
 		glm::radians(90.0f * std::sin(wobble * float(M_PI))),
 		glm::vec3(1.0f, 0.0f, 0.0f)
 		);
+
 	}
 	else{
 		water_bucket->rotation = water_bucket_rotation_original;
 	}
+
+	if(should_spawn){
+		spawn_tree();
+		should_spawn = false;
+	}
+
 
 	//move camera:
 	{
@@ -255,9 +317,16 @@ void PlayMode::update(float elapsed) {
 	w_down.downs = 0;
 }
 
-// void PlayMode::spawn_tree(){
+//TODO: change the transform of the tree
+void PlayMode::spawn_tree(){
+	should_spawn = false;
 
-// }
+	leaves_vector[treeCnt]->position = water_bucket->position + leaves->position - trunk->position;
+	leaves_vector[treeCnt]->position.z = leaves->position.z;
+	trunk_vector[treeCnt]->position = water_bucket->position;
+	trunk_vector[treeCnt]->position.z = trunk->position.z;
+	treeCnt = treeCnt + 1;
+}
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	//update camera aspect ratio for drawable:

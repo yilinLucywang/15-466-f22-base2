@@ -29,15 +29,31 @@ struct PlayMode : Mode {
 
 	//local copy of the game scene (so code can change it during gameplay):
 	Scene scene;
-	void spawn_tree();
 	// hexapod leg to wobble:
-	// Scene::Transform *hip = nullptr;
-	// Scene::Transform *upper_leg = nullptr;
-	// Scene::Transform *lower_leg = nullptr;
+	Scene::Transform *leaves = nullptr;
+	Scene::Transform *trunk = nullptr;
+
+
+	Scene::Transform *leaves0 = nullptr;
+	Scene::Transform *leaves1 = nullptr;
+	Scene::Transform *leaves2 = nullptr;
+	Scene::Transform *leaves3 = nullptr;
+	Scene::Transform *leaves4 = nullptr;
+
+	Scene::Transform *trunk0 = nullptr;
+	Scene::Transform *trunk1 = nullptr;
+	Scene::Transform *trunk2 = nullptr;
+	Scene::Transform *trunk3 = nullptr;
+	Scene::Transform *trunk4 = nullptr;
+
+	std::vector<Scene::Transform*> leaves_vector = {};
+	std::vector<Scene::Transform*> trunk_vector = {};
 	// glm::quat hip_base_rotation;
 	// glm::quat upper_leg_base_rotation;
 	float wobble = 0.0f;
-	
+	int treeCnt = 0;
+	bool should_spawn = false;
+	void spawn_tree();
 	//camera:
 	Scene::Camera *camera = nullptr;
 	//water bucket: 
