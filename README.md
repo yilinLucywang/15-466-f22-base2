@@ -3,10 +3,7 @@
 Author: Yilin Wang
 
 Design: My game use water bucket to water the ground and new trees will be spawn from the watered location. In this way, the forest is no longer treeless. 
-
-Screen Shot:
-
-
+screenShot: 
 ![Screen Shot](screenshot.png)<img width="1043" alt="截屏2022-09-15 05 28 24" src="https://user-images.githubusercontent.com/72194580/190264595-87d78da6-468d-4ed8-ad79-94d6a5fa6736.png">
 
 
