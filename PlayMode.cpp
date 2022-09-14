@@ -47,7 +47,7 @@ PlayMode::PlayMode() : scene(*hexapod_scene) {
 	// if (upper_leg == nullptr) throw std::runtime_error("Upper leg not found.");
 	// if (lower_leg == nullptr) throw std::runtime_error("Lower leg not found.");
 
-	// hip_base_rotation = hip->rotation;
+	//water_bucket_rotation = water_bucket->rotation;
 	// upper_leg_base_rotation = upper_leg->rotation;
 	// lower_leg_base_rotation = lower_leg->rotation;
 
@@ -108,6 +108,13 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			w_down.pressed = true;
 			return true;
 		}
+
+		//pours the water to the groud
+		// else if(evt.key.keysym.sym == SDLK_p) {
+		// 	pour_water.downs += 1; 
+		// 	pour_water.pressed = true; 
+		// 	return true;
+		// }
 		//TODO: change end
 
 
@@ -141,6 +148,10 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			w_down.pressed = false;
 			return true;
 		}
+		// else if(evt.key.keysym.sym == SDLK_p) {
+		// 	pour_water.pressed = false;
+		// 	return true; 
+		// }
 		//TODO: change end
 
 	//TODO: change here
@@ -186,6 +197,11 @@ void PlayMode::update(float elapsed) {
 	// 	glm::vec3(0.0f, 0.0f, 1.0f)
 	// );
 
+	// water_bucket->rotation = water_bucket_rotation * glm::angleAxis(
+	// glm::radians(5.0f * std::sin(wobble * 2.0f * float(M_PI))),
+	// glm::vec3(0.0f, 1.0f, 0.0f)
+	// );
+
 	//move camera:
 	{
 
@@ -219,7 +235,6 @@ void PlayMode::update(float elapsed) {
 
 		//make it so that moving diagonally doesn't go faster:
 		if (w_move != glm::vec2(0.0f)) w_move = glm::normalize(w_move) * PlayerSpeed * elapsed;
-
 		// glm::mat4x3 frame = camera->transform->make_local_to_parent();
 		// glm::vec3 frame_right = frame[0];
 		// //glm::vec3 up = frame[1];
@@ -228,11 +243,13 @@ void PlayMode::update(float elapsed) {
 		// camera->transform->position += move.x * frame_right + move.y * frame_forward;
 
 		glm::mat4x3 w_frame = water_bucket->make_local_to_parent();
-		glm::vec3 w_frame_right = w_frame[0];
-		//glm::vec3 up = frame[1];
-		glm::vec3 w_frame_forward = -w_frame[2];
+		//glm::vec3 w_frame_right = w_frame[2];
+		glm::vec3 w_frame_up = w_frame[1];
+		glm::vec3 w_frame_forward = w_frame[0];
 		//TODO: water bucket move
-		water_bucket->position += w_move.x * w_frame_right + w_move.y * w_frame_forward; 
+		water_bucket->position += w_move.x * w_frame_up;
+		//TODO: issues here
+		water_bucket->position += (-1.0f) * w_move.y * w_frame_forward; 
 	}
 
 	//reset button press counters:
@@ -244,7 +261,12 @@ void PlayMode::update(float elapsed) {
 	w_right.downs = 0;
 	w_up.downs = 0;
 	w_down.downs = 0;
+	// pour_water.downs = 0;
 }
+
+// void PlayMode::spawn_tree(){
+
+// }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
 	//update camera aspect ratio for drawable:
